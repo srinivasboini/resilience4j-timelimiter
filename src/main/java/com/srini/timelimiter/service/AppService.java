@@ -1,5 +1,7 @@
 package com.srini.timelimiter.service;
 
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,9 @@ public class AppService {
      *
      * @return the completable future
      */
+    @Bulkhead(name = "serviceA",  type = Bulkhead.Type.THREADPOOL)
     @TimeLimiter(name = "serviceA", fallbackMethod = "fallbackA")
+    @CircuitBreaker(name = "serviceA")
     public CompletableFuture<String> get(){
         log.info("Starting to execute a call for more than 2s");
         try {
